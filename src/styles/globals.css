@@ -115,9 +115,9 @@
     @apply border-border outline-ring/50;
   }
 
-  @media (max-width: 350px) {
+  @media (max-width: 380px) {
     html {
-      font-size: calc(100vw / 350 * 16)
+      font-size: calc(100vw / 380 * 16)
     }
   }
 

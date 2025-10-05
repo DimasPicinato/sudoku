@@ -1,7 +1,8 @@
-import { RefreshCw, X } from 'lucide-react';
+import { Grid3x3, RefreshCw, X } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 
+import { useGameConfigStore } from '@/stores/game-config.store';
 import { useGameStore } from '@/stores/game.store';
 import { useScoreStore } from '@/stores/score.store';
 
@@ -15,15 +16,19 @@ import { getElapsedTime } from '@/utils/get-elapsed-time';
 
 import { Button } from '@/components/ui/button';
 import { ButtonGroup } from '@/components/ui/button-group';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 
 export function RunningPage() {
   const [select, setSelect] = useState<number | null>(null);
+  const [hoverRow, setHoverRow] = useState<number | null>(null);
+  const [hoverCol, setHoverCol] = useState<number | null>(null);
   const { difficulty } = useParams();
   const { startGame, startedTime, clearGame, board, saveBoard, difficulty: storedDifficulty } = useGameStore();
   const [currentBoard, setCurrentBoard] = useState<Cell[][]>(board ?? generateSudoku(difficulty as Difficulty));
   const [time, setTime] = useState<Date>(new Date(startedTime ? getElapsedTime(startedTime) : 0));
   const { addTime } = useScoreStore();
   const navigate = useNavigate();
+  const { hoverMode, setHoverMode } = useGameConfigStore();
 
   useEffect(() => {
     if (storedDifficulty !== difficulty) navigate(`/${storedDifficulty}`, { replace: true });
@@ -125,14 +130,19 @@ export function RunningPage() {
   useEffect(() => {
     if (completedNumbers.size === 9) {
       addTime({ time: time.getTime(), difficulty: difficulty as Difficulty });
-      clearGame();
       navigate('/');
     }
   }, [completedNumbers]);
 
   return (
     <div className="flex h-full flex-col items-center justify-center gap-4 p-4">
-      <table className="w-fit border-collapse">
+      <table
+        className="w-fit border-collapse"
+        onMouseLeave={() => {
+          setHoverCol(null);
+          setHoverRow(null);
+        }}
+      >
         <tbody>
           {currentBoard.map((v, r) => (
             <tr key={r}>
@@ -156,16 +166,33 @@ export function RunningPage() {
                   >
                     <button
                       className={cn(
-                        'text-foreground flex size-[min(calc((100dvh-15rem)/9),calc(100vw/170*16))] items-center justify-center text-[min(calc((55dvh-12rem)/9),calc(55vw/170*16))]',
+                        'text-foreground flex size-[min(calc((100dvh-15rem)/9),calc(100dvw/180*16))] items-center justify-center text-[min(calc((55dvh-12rem)/9),calc(55vw/170*16))]',
                         (!select || currentBoard[r][c].fixed) && 'cursor-default',
                         currentBoard[r][c].fixed && 'font-black',
+                        hoverMode &&
+                          hoverRow === r &&
+                          cn('bg-foreground/10', select === currentBoard[r][c].currentValue && 'bg-orange-600/20!'),
+                        hoverMode &&
+                          hoverCol === c &&
+                          cn('bg-foreground/10', select === currentBoard[r][c].currentValue && 'bg-orange-600/20!'),
+                        hoverMode &&
+                          hoverRow !== null &&
+                          hoverCol !== null &&
+                          Math.floor(r / 3) === Math.floor(hoverRow / 3) &&
+                          Math.floor(c / 3) === Math.floor(hoverCol / 3) &&
+                          cn('bg-foreground/10', select === currentBoard[r][c].currentValue && 'bg-orange-600/20!'),
+                        hoverRow === r && hoverCol === c && 'bg-foreground/20',
                         select === currentBoard[r][c].currentValue &&
                           cn(
-                            'bg-foreground/20',
+                            'bg-foreground/30',
                             invalidCells.has(`${r}-${c}`) && 'bg-red-600',
                             completedNumbers.has(select) && 'bg-green-600',
                           ),
                       )}
+                      onMouseEnter={() => {
+                        setHoverRow(r);
+                        setHoverCol(c);
+                      }}
                       onClick={() => {
                         if (select && !currentBoard[r][c].fixed) {
                           setCurrentBoard(prev => {
@@ -228,23 +255,47 @@ export function RunningPage() {
           <h4>
             {time.getMinutes().toString().padStart(2, '0')}:{time.getSeconds().toString().padStart(2, '0')}
           </h4>
-          <Button
-            variant="outline"
-            onClick={() => {
-              clearGame();
-              setTime(new Date(0));
-            }}
-          >
-            <RefreshCw />
-            Resetar
-          </Button>
-          <Button
-            variant="outline"
-            onClick={() => navigate('/')}
-          >
-            <X />
-            Sair
-          </Button>
+          <div className="flex items-center gap-2">
+            <Tooltip>
+              <TooltipTrigger>
+                <Button
+                  variant={hoverMode ? 'default' : 'outline'}
+                  size="icon"
+                  onClick={() => setHoverMode(!hoverMode)}
+                >
+                  <Grid3x3 />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>{hoverMode ? 'Desativar realce' : 'Ativar realce'}</TooltipContent>
+            </Tooltip>
+            <Tooltip>
+              <TooltipTrigger>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={() => {
+                    clearGame();
+                    setTime(new Date(0));
+                  }}
+                >
+                  <RefreshCw />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>Resetar</TooltipContent>
+            </Tooltip>
+            <Tooltip>
+              <TooltipTrigger>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={() => navigate('/')}
+                >
+                  <X />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>Sair</TooltipContent>
+            </Tooltip>
+          </div>
         </div>
       ) : null}
     </div>
