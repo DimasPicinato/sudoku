@@ -5,6 +5,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { useGameConfigStore } from '@/stores/game-config.store';
 import { useGameStore } from '@/stores/game.store';
 import { useScoreStore } from '@/stores/score.store';
+import { toast } from 'sonner';
 
 import type { Cell } from '@/@types/cell';
 import type { Difficulty } from '@/@types/difficulty';
@@ -130,6 +131,7 @@ export function RunningPage() {
   useEffect(() => {
     if (completedNumbers.size === 9) {
       addTime({ time: time.getTime(), difficulty: difficulty as Difficulty });
+      toast.message(`Você completou em ${time.getMinutes()}:${time.getSeconds()}.`);
       navigate('/');
     }
   }, [completedNumbers]);

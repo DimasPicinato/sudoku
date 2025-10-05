@@ -8,8 +8,11 @@ import { AppLayout } from './app/app.layout';
 import { RunningPage } from './app/game/running.page';
 import { StartPage } from './app/game/start.page';
 
+import { Toaster } from './components/ui/sonner';
+
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
+    <Toaster />
     <BrowserRouter>
       <Routes>
         <Route
