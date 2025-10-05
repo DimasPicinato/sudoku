@@ -131,7 +131,9 @@ export function RunningPage() {
   useEffect(() => {
     if (completedNumbers.size === 9) {
       addTime({ time: time.getTime(), difficulty: difficulty as Difficulty });
-      toast.message(`Você completou em ${time.getMinutes()}:${time.getSeconds()}.`);
+      toast.success(
+        `Você completou em ${time.getMinutes().toString().padStart(2, '0')}:${time.getSeconds().toString().padStart(2, '0')}.`,
+      );
       navigate('/');
     }
   }, [completedNumbers]);

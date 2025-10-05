@@ -12,7 +12,7 @@ import { Toaster } from './components/ui/sonner';
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <Toaster />
+    <Toaster position="top-center" />
     <BrowserRouter>
       <Routes>
         <Route

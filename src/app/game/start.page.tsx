@@ -116,7 +116,8 @@ export function StartPage() {
                 <TableRow>
                   <TableCell>Díficil</TableCell>
                   <TableCell>
-                    {bestTimes.hard.getMinutes()}:{bestTimes.hard.getSeconds()}
+                    {bestTimes.hard.getMinutes().toString().padStart(2, '0')}:
+                    {bestTimes.hard.getSeconds().toString().padStart(2, '0')}
                   </TableCell>
                 </TableRow>
               ) : null}
@@ -124,7 +125,8 @@ export function StartPage() {
                 <TableRow>
                   <TableCell>Médio</TableCell>
                   <TableCell>
-                    {bestTimes.medium.getMinutes()}:{bestTimes.medium.getSeconds()}
+                    {bestTimes.medium.getMinutes().toString().padStart(2, '0')}:
+                    {bestTimes.medium.getSeconds().toString().padStart(2, '0')}
                   </TableCell>
                 </TableRow>
               ) : null}
@@ -132,7 +134,8 @@ export function StartPage() {
                 <TableRow>
                   <TableCell>Fácil</TableCell>
                   <TableCell>
-                    {bestTimes.easy.getMinutes()}:{bestTimes.easy.getSeconds()}
+                    {bestTimes.easy.getMinutes().toString().padStart(2, '0')}:
+                    {bestTimes.easy.getSeconds().toString().padStart(2, '0')}
                   </TableCell>
                 </TableRow>
               ) : null}
